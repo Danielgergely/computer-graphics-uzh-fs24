@@ -1,0 +1,8 @@
+Exercise1_2
+Exercise0
+*/.idea
+*/build
+*/cmake-build-debug
+*/submission
+*.zip
+vcpkg
