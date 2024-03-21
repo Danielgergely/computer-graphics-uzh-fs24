@@ -75,28 +75,32 @@ namespace cgCourse
 	}
 
 	// TODO: complete the following methods
-	void Shape::setPosition(const glm::vec3 & pos)
-	{
-        glm::mat4 translation = glm::translate(glm::mat4(1.0f), pos);
-        modelMatrix = modelMatrix * translation;
-	}
+    void Shape::setPosition(const glm::vec3& pos) {
+        translationMatrix = glm::translate(glm::mat4(1.0f), pos);
+        calculateModelMatrix();
+    }
 
-	void Shape::setRotation(float angle, const glm::vec3 & rot)
-	{
-        glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), angle, rot);
-        modelMatrix = modelMatrix * rotation;
-	}
+    void Shape::setRotation(float angle, const glm::vec3& rot) {
+        rotationMatrix = glm::rotate(glm::mat4(1.0f), angle, rot);
+        calculateModelMatrix();
+    }
 
-	void Shape::setScaling(const glm::vec3 & scale)
-	{
-        glm::mat4 scaling = glm::scale(glm::mat4(1.0f), scale);
-        modelMatrix = modelMatrix * scaling;
-	}
+    void Shape::setScaling(const glm::vec3& scale) {
+        scalingMatrix = glm::scale(glm::mat4(1.0f), scale);
+        calculateModelMatrix();
+    }
 
-	void Shape::calculateModelMatrix()
-	{
+    void Shape::calculateModelMatrix() {
+        // Reset modelMatrix with an identity matrix
         modelMatrix = glm::mat4(1.0f);
-	}
+        // Apply transformations: first scale, then rotate, then translate
+        modelMatrix = translationMatrix * rotationMatrix * scalingMatrix * modelMatrix;
+    }
+
+    void Shape::setModelMatrix(glm::mat4 newModelMatrix) {
+        modelMatrix = newModelMatrix;
+    }
+
 
 	void Shape::initIndexBuffer()
 	{

@@ -35,6 +35,8 @@ namespace cgCourse {
 
         void calculateModelMatrix();
 
+        void setModelMatrix(glm::mat4 newModelMatrix);
+
     protected:
         virtual void initIndexBuffer();
 
