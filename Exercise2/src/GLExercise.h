@@ -30,6 +30,7 @@ namespace cgCourse
 	private:
 		void renderCubes();
 		void renderTorus();
+        void resetShapes();
 
 		std::shared_ptr<ShaderProgram> programForShape;
 		std::shared_ptr<ShaderProgram> programForTorusNormals;
@@ -50,11 +51,20 @@ namespace cgCourse
 		bool normalsAsColor = false;
         bool scale = false;
         bool rotate = false;
+        bool spin = false;
+        bool offset = false;
 
         // scaling variables
         int scaleCounter = 500;
-        float scaleFactor = 0.999f;
+        float scaleFactor = 1.0f;
         bool isDecreasing = true;
+
+        // rotation variables
+        float rotationAngle = 0.2f;
+
+        // torus variables
+        std::vector<glm::vec3> torusPositions;
+        std::vector<std::tuple<float, glm::vec3>> torusRotations;
 	};
 }
 

@@ -4,49 +4,50 @@
 
 #include <iostream>
 
-namespace cgCourse
-{
-	GLExercise::GLExercise(glm::uvec2 _windowSize, std::string _title): GLApp(_windowSize, _title, false) {}
+namespace cgCourse {
+    GLExercise::GLExercise(glm::uvec2 _windowSize, std::string _title) : GLApp(_windowSize, _title, false) {}
 
-	bool GLExercise::init()
-	{
-		// Framebuffer size and window size may be different in high-DPI displays
-		// setup camera with standard view (static for our case)
-		cam.create(	getFramebufferSize(),
-					glm::vec3(3, 3, -3),
-					glm::vec3(0, 0, 0),
-					glm::vec3(0, 1, 0)
-					);
+    bool GLExercise::init() {
+        // Framebuffer size and window size may be different in high-DPI displays
+        // setup camera with standard view (static for our case)
+        cam.create(getFramebufferSize(),
+                   glm::vec3(3, 3, -3),
+                   glm::vec3(0, 0, 0),
+                   glm::vec3(0, 1, 0)
+        );
 
-		programForShape = std::make_shared<ShaderProgram>(std::string(SHADER_DIR) + "/Shape");
-		programForTorusNormals = std::make_shared<ShaderProgram>(std::string(SHADER_DIR) + "/Normals");
+        programForShape = std::make_shared<ShaderProgram>(std::string(SHADER_DIR) + "/Shape");
+        programForTorusNormals = std::make_shared<ShaderProgram>(std::string(SHADER_DIR) + "/Normals");
 
-		// Init models
-		cube = std::make_shared<Cube>();
-		if(!cube->createVertexArray(0, 1, 2))
-			return false;
+        // Init models
+        cube = std::make_shared<Cube>();
+        if (!cube->createVertexArray(0, 1, 2))
+            return false;
 
-		torus = std::make_shared<Torus>();
-		if(!torus->createVertexArray(0, 1, 2))
-			return false;
+        torus = std::make_shared<Torus>();
+        if (!torus->createVertexArray(0, 1, 2))
+            return false;
 
 
-		// TODO: setup some initial transformation for the cube and toruses, use the implemented methods from Shape.
-		// the initial state of the exercise only create one torus, you need to do modifications maybe in Shape.h to create the 6 torus.
+        // TODO: setup some initial transformation for the cube and toruses, use the implemented methods from Shape.
+        // the initial state of the exercise only create one torus, you need to do modifications maybe in Shape.h to create the 6 torus.
+
+//        cube->setPosition(glm::vec3(1.0, 1.0, 0.0) );
+//        cube->setScaling(glm::vec3(0.25f));
 
         // create 6 toruses
-        std::vector<glm::vec3> torusPositions = {
-                glm::vec3(0.0, 1.4, 0.0),
-                glm::vec3(0.0, -1.4, 0.0),
-                glm::vec3(1.4, 0.0, 0.0),
-                glm::vec3(-1.4, 0.0, 0.0),
-                glm::vec3(0.0, 0.0, 1.4),
-                glm::vec3(0.0, 0.0, -1.4)
+        torusPositions = {
+                glm::vec3(0.0, 1.3, 0.0),
+                glm::vec3(0.0, -1.3, 0.0),
+                glm::vec3(1.3, 0.0, 0.0),
+                glm::vec3(-1.3, 0.0, 0.0),
+                glm::vec3(0.0, 0.0, 1.3),
+                glm::vec3(0.0, 0.0, -1.3),
         };
 
-        std::vector<std::tuple<float, glm::vec3>> torusRotations = {
-                {glm::radians(0.0f), glm::vec3(0.0, 0.0, 1.0)},
-                {glm::radians(0.0f), glm::vec3(0.0, 0.0, 1.0)},
+        torusRotations = {
+                {glm::radians(0.0f),  glm::vec3(0.0, 0.0, 1.0)},
+                {glm::radians(0.0f),  glm::vec3(0.0, 0.0, 1.0)},
                 {glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0)},
                 {glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0)},
                 {glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0)},
@@ -55,62 +56,47 @@ namespace cgCourse
 
         // rotate/scale/position all
         toruses = torus->createMultiple(6);
-        for(int i = 0; i < toruses.size(); i++) {
+
+        for (int i = 0; i < toruses.size(); i++) {
             toruses[i]->setPosition(torusPositions[i]);
-            toruses[i]->setRotation(get<0>(torusRotations[i]),get<1>(torusRotations[i]));
+            toruses[i]->setRotation(get<0>(torusRotations[i]), get<1>(torusRotations[i]));
             toruses[i]->setScaling(glm::vec3(0.75f));
 
-            if(!toruses[i]->createVertexArray(0, 1, 2))
+            if (!toruses[i]->createVertexArray(0, 1, 2))
                 return false;
 
             normalsTorus = std::make_shared<MultiLine>(toruses[i]->positions, toruses[i]->normals);
             normalsTorus->setPosition(torusPositions[i]);
-            normalsTorus->setRotation(get<0>(torusRotations[i]),get<1>(torusRotations[i]));
+            normalsTorus->setRotation(get<0>(torusRotations[i]), get<1>(torusRotations[i]));
             normalsTorus->setScaling(glm::vec3(0.75f));
-            if(!normalsTorus->createVertexArray(0, 1, 2))
+            if (!normalsTorus->createVertexArray(0, 1, 2))
                 return false;
             normalsToruses.push_back(normalsTorus);
         }
 
         normalsCube = std::make_shared<MultiLine>(cube->positions, cube->normals);
-        if(!normalsCube->createVertexArray(0, 1, 2))
+        if (!normalsCube->createVertexArray(0, 1, 2))
             return false;
 
-//
-//        torus->setPosition(glm::vec3(0.0, 0.0, 1.4));
-//        torus->setScaling(glm::vec3(0.75f));
-//        torus->setRotation(glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0));
+        return true;
+    }
 
-
-		// Init multiline field for normals of objects
-//		normalsTorus = std::make_shared<MultiLine>(torus->positions, torus->normals);
-//        normalsTorus->setPosition(glm::vec3(1.0, 0.0, 0.0));
-//		if(!normalsTorus->createVertexArray(0, 1, 2))
-//			return false;
-
-//        normalsTorus->setPosition(glm::vec3(0.0, 1.1, 0.0));
-//        normalsTorus->setScaling(glm::vec3(0.75f));
-
-		return true;
-	}
-
-	bool GLExercise::update()
-	{
+    bool GLExercise::update() {
         // TODO: implement the animation of the cube and toruses
+        if (offset) {
+            cube->setPosition(glm::vec3(-1, 0, 1));
+            normalsCube->setPosition(glm::vec3(-1, 0, 1));
+        }
+
         if (scale) {
+            if (isDecreasing) {
+                scaleFactor += 0.001f; // increase
+            } else {
+                scaleFactor -= 0.001f; // decrease
+            }
             if (scaleCounter >= 1000) {
-                if (isDecreasing) {
-                    scaleFactor = 1.001; // increase
-                } else {
-                    scaleFactor = 0.999; // decrease
-                }
                 isDecreasing = !isDecreasing;
                 scaleCounter = 0;
-            }
-
-            for (int i = 0; i < toruses.size(); i++) {
-                toruses[i]->setScaling(glm::vec3(scaleFactor, scaleFactor, scaleFactor));
-                normalsToruses[i]->setScaling(glm::vec3(scaleFactor, scaleFactor, scaleFactor));
             }
 
             cube->setScaling(glm::vec3(scaleFactor, scaleFactor, scaleFactor));
@@ -119,64 +105,102 @@ namespace cgCourse
         }
 
         if (rotate) {
+            rotationAngle += 0.2f;
+            cube->setRotation(glm::radians(rotationAngle), glm::vec3(1.0f, 1.0f, 1.0f));
+            normalsCube->setRotation(glm::radians(rotationAngle), glm::vec3(1.0f, 1.0f, 1.0f));
 
-            for (int i = 0; i < toruses.size(); i++) { // fix this
-                toruses[i]->setRotation(glm::radians(.2f), glm::vec3(1.0f, 1.0f, 1.0f));
-                normalsToruses[i]->setRotation(glm::radians(.2f), glm::vec3(1.0f, 1.0f, 1.0f));
-            }
-
-            cube->setRotation(glm::radians(.2f), glm::vec3(1.0f, 1.0f, 1.0f));
-            normalsCube->setRotation(glm::radians(.2f), glm::vec3(1.0f, 1.0f, 1.0f));
         }
 
-		return true;
-	}
+        if (offset || scale || rotate) {
+            // get cube model matrix
+            glm::mat4 cubeModelMatrix = cube->getModelMatrix();
+            for (int i = 0; i < toruses.size(); i++) {
 
-	bool GLExercise::render()
-	{
-		glEnable(GL_DEPTH_TEST);
+                glm::mat4 torusModelMatrix = glm::mat4(1.0f); // Reset to identity matrix
 
-		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glEnable(GL_CULL_FACE);
-		glCullFace(GL_BACK);
+                // perform translation on model matrix
+                torusModelMatrix = glm::translate(torusModelMatrix, torusPositions[i]);
+                torusModelMatrix = glm::rotate(torusModelMatrix, get<0>(torusRotations[i]), get<1>(torusRotations[i]));
+                torusModelMatrix = glm::scale(torusModelMatrix, glm::vec3(0.75f));
 
-		update();
+                // Apply cube matrix
+                torusModelMatrix = cubeModelMatrix * torusModelMatrix;
+                toruses[i]->setModelMatrix(torusModelMatrix);
 
-		glProgramUniform1i(*programForShape, programForShape->getUniformLocation("useNormalMatrix"), useNormalMatrix);
-		glProgramUniform1i(*programForShape, programForShape->getUniformLocation("normalsAsColor"), normalsAsColor);
+                // repeat for normals
+                glm::mat4 torusNormalsModelMatrix = glm::mat4(1.0f);
+                torusNormalsModelMatrix = glm::translate(torusNormalsModelMatrix, torusPositions[i]);
+                torusNormalsModelMatrix = glm::rotate(torusNormalsModelMatrix, get<0>(torusRotations[i]),
+                                                      get<1>(torusRotations[i]));
+                torusNormalsModelMatrix = glm::scale(torusNormalsModelMatrix, glm::vec3(0.75f));
 
-		renderCubes();
-		renderTorus();
+                torusNormalsModelMatrix = cubeModelMatrix * torusNormalsModelMatrix;
+                normalsToruses[i]->setModelMatrix(torusNormalsModelMatrix);
+            }
+        }
 
-		return true;
-	}
+        if (spin) {
+            rotationAngle = 0.005f;
 
-	void GLExercise::renderCubes()
-	{
-		programForShape->bind();
+            // Loop through each torus
+            for (int i = 0; i < toruses.size(); i++) {
+                glm::vec3 rotationAxis;
+                glm::mat4 torusModelMatrix = toruses[i]->getModelMatrix();
+                glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), rotationAngle, glm::vec3(0.0f, 1.0f, 0.0f));
+                toruses[i]->setModelMatrix(torusModelMatrix * rotationMatrix);
+
+                glm::mat4 normalModelMatrix = normalsToruses[i]->getModelMatrix();
+                glm::mat4 normalRotationMatrix = glm::rotate(glm::mat4(1.0f), rotationAngle,
+                                                             glm::vec3(0.0f, 1.0f, 0.0f));
+                normalsToruses[i]->setModelMatrix(normalModelMatrix * rotationMatrix);
+            }
+        }
+
+        return true;
+    }
+
+    bool GLExercise::render() {
+        glEnable(GL_DEPTH_TEST);
+
+        glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+
+        update();
+
+        glProgramUniform1i(*programForShape, programForShape->getUniformLocation("useNormalMatrix"), useNormalMatrix);
+        glProgramUniform1i(*programForShape, programForShape->getUniformLocation("normalsAsColor"), normalsAsColor);
+
+        renderCubes();
+        renderTorus();
+
+        return true;
+    }
+
+    void GLExercise::renderCubes() {
+        programForShape->bind();
 
         mvpMatrix = cam.getViewProjectionMatrix() * cube->getModelMatrix();
-		// normalMatrix = TODO: compute the normal matrix
+        // normalMatrix = TODO: compute the normal matrix
         normalMatrix = glm::transpose(glm::inverse(cube->getModelMatrix()));
-		glUniformMatrix4fv(programForShape->getUniformLocation("mvpMatrix"), 1, GL_FALSE, &mvpMatrix[0][0]);
-		glUniformMatrix3fv(programForShape->getUniformLocation("normalMatrix"), 1, GL_FALSE, &normalMatrix[0][0]);
-		cube->draw();
+        glUniformMatrix4fv(programForShape->getUniformLocation("mvpMatrix"), 1, GL_FALSE, &mvpMatrix[0][0]);
+        glUniformMatrix3fv(programForShape->getUniformLocation("normalMatrix"), 1, GL_FALSE, &normalMatrix[0][0]);
+        cube->draw();
 
-		programForShape->unbind();
+        programForShape->unbind();
 
-        if(!drawNormals) return;
+        if (!drawNormals) return;
 
         programForTorusNormals->bind();
         mvpMatrix = cam.getViewProjectionMatrix() * normalsCube->getModelMatrix();
 
-        glUniformMatrix4fv(programForTorusNormals->getUniformLocation("mvpMatrix"), 1,GL_FALSE, &mvpMatrix[0][0]);
+        glUniformMatrix4fv(programForTorusNormals->getUniformLocation("mvpMatrix"), 1, GL_FALSE, &mvpMatrix[0][0]);
         normalsCube->draw();
         programForTorusNormals->unbind();
-	}
+    }
 
-	void GLExercise::renderTorus()
-	{
+    void GLExercise::renderTorus() {
         for (int i = 0; i < toruses.size(); i++) {
             programForShape->bind();
 
@@ -190,36 +214,65 @@ namespace cgCourse
             programForShape->unbind();
 
 
-            if(!drawNormals) continue;
+            if (!drawNormals) continue;
 
             // TODO: draw the torus normals using the multiline object
             programForTorusNormals->bind();
             mvpMatrix = cam.getViewProjectionMatrix() * normalsToruses[i]->getModelMatrix();
 
-            glUniformMatrix4fv(programForTorusNormals->getUniformLocation("mvpMatrix"), 1,GL_FALSE, &mvpMatrix[0][0]);
+            glUniformMatrix4fv(programForTorusNormals->getUniformLocation("mvpMatrix"), 1, GL_FALSE, &mvpMatrix[0][0]);
             normalsToruses[i]->draw();
             programForTorusNormals->unbind();
         }
 
-	}
+    }
 
-	bool GLExercise::end()
-	{
-		programForShape->deleteShaderProgramFromGPU();
-		programForTorusNormals->deleteShaderProgramFromGPU();
-		return true;
-	}
+    void GLExercise::resetShapes() {
+        // Reset cube position
+        cube->setModelMatrix(glm::mat4(1.0f));
+        cube->setPosition(glm::vec3(0.0f));
+        cube->setRotation(.0f, glm::vec3(1.0f));
+        cube->setScaling(glm::vec3(1.0f));
+        normalsCube->setModelMatrix(glm::mat4(1.0f));
+        normalsCube->setPosition(glm::vec3(0.0f));
+        normalsCube->setRotation(.0f, glm::vec3(1.0f));
+        normalsCube->setScaling(glm::vec3(1.0f));
 
-	void GLExercise::imgui()
-	{
-		ImGui::SetNextWindowSize(ImVec2(200, -1));
-		ImGui::Begin("status", nullptr, ImGuiWindowFlags_NoTitleBar);
-		ImGui::Checkbox("drawNormals", &drawNormals);
-		ImGui::Checkbox("useNormalMatrix", &useNormalMatrix);
-		ImGui::Checkbox("normalsAsColor", &normalsAsColor);
+        // Reset torus positions, rotations, and scaling
+        for (int i = 0; i < toruses.size(); i++) {
+            toruses[i]->setModelMatrix(glm::mat4(1.0f));
+            toruses[i]->setPosition(torusPositions[i]);
+            toruses[i]->setRotation(get<0>(torusRotations[i]), get<1>(torusRotations[i]));
+            toruses[i]->setScaling(glm::vec3(0.75f));
+
+            normalsToruses[i]->setModelMatrix(glm::mat4(1.0f));
+            normalsToruses[i]->setPosition(torusPositions[i]);
+            normalsToruses[i]->setRotation(get<0>(torusRotations[i]), get<1>(torusRotations[i]));
+            normalsToruses[i]->setScaling(glm::vec3(0.75f));
+        }
+    }
+
+    bool GLExercise::end() {
+        programForShape->deleteShaderProgramFromGPU();
+        programForTorusNormals->deleteShaderProgramFromGPU();
+        return true;
+    }
+
+    void GLExercise::imgui() {
+        ImGui::SetNextWindowSize(ImVec2(200, -1));
+        ImGui::Begin("status", nullptr, ImGuiWindowFlags_NoTitleBar);
+        ImGui::Checkbox("drawNormals", &drawNormals);
+        ImGui::Checkbox("useNormalMatrix", &useNormalMatrix);
+        ImGui::Checkbox("normalsAsColor", &normalsAsColor);
         ImGui::Checkbox("scale", &scale);
         ImGui::Checkbox("rotate", &rotate);
-		ImGui::End();
-	}
+        ImGui::Checkbox("spin", &spin);
+        ImGui::Checkbox("offset", &offset);
+
+        if (ImGui::Button("Reset Shapes")) {
+            resetShapes();
+        }
+        ImGui::End();
+    }
 }
 
