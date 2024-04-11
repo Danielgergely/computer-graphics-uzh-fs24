@@ -38,13 +38,26 @@ uniform bool gouraudShading;
 //} light;
 
 // V2
+
+uniform struct Light {
+    vec3 position;
+    vec3 color;
+} light;
+
+uniform struct Material {
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+    float shininess;
+} material;
+
 uniform vec3 viewPosition;
-uniform vec3 lightPosition;
-uniform vec3 lightColor;
-uniform vec3 ambient;
-uniform vec3 diffuse;
-uniform vec3 specular;
-uniform float shininess;
+//uniform vec3 lightPosition;
+//uniform vec3 lightColor;
+//uniform vec3 ambient;
+//uniform vec3 diffuse;
+//uniform vec3 specular;
+//uniform float shininess;
 
 
 // END TODO
@@ -71,18 +84,18 @@ void main()
         // TODO add there code for gouraud shading
         worldPos = vec3(modelMatrix * vec4(vPosition, 1.f));
         vec3 norm = normalize(normal);
-        vec3 lightVector = normalize(lightPosition - worldPos);
+        vec3 lightVector = normalize(light.position - worldPos);
         vec3 viewDirection = normalize(viewPosition - worldPos);
         vec3 eyeVector = reflect(-lightVector, norm);
 
-        vec3 ambient = ambient * objectColor * lightColor;
+        vec3 ambient = material.ambient * objectColor * light.color;
         float diff = max(dot(norm, lightVector), 0.0);
-        vec3 diffuse = diffuse * diff * objectColor * lightColor;
+        vec3 diffuse = material.diffuse * diff * objectColor * light.color;
 
-        float spec = pow(max(dot(viewDirection, eyeVector), 0.f), shininess);
-        vec3 specular = specular * spec * objectColor * lightColor;
+        float spec = pow(max(dot(viewDirection, eyeVector), 0.f), material.shininess);
+        vec3 specular = material.specular * spec * objectColor * light.color;
 
-        objectColor = (ambient + diffuse + specular) * objectColor * lightColor;
+        objectColor = (ambient + diffuse + specular) * light.color * objectColor;
 
         // END TODO
     }

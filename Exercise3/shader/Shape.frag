@@ -13,12 +13,12 @@ in vec3 worldPos;
  */
 
 // slides version not working...
-//layout(std140) uniform Light {
+//uniform struct Light {
 //    vec4 position;
 //    vec4 color;
 //} light;
 //
-//layout(std140) uniform Material {
+//uniform struct Material {
 //    float ambient;
 //    float diffuse;
 //    float specular;
@@ -28,12 +28,24 @@ in vec3 worldPos;
 // V2
 
 uniform vec3 viewPosition;
-uniform vec3 lightPosition;
-uniform vec3 lightColor;
-uniform vec3 ambient;
-uniform vec3 diffuse;
-uniform vec3 specular;
-uniform float shininess;
+
+uniform struct Light {
+    vec3 position;
+    vec3 color;
+} light;
+
+uniform struct Material {
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+    float shininess;
+} material;
+//uniform vec3 lightPosition;
+//uniform vec3 lightColor;
+//uniform vec3 ambient;
+//uniform vec3 diffuse;
+//uniform vec3 specular;
+//uniform float shininess;
 
 uniform mat4 viewMatrix;
 
@@ -53,18 +65,15 @@ void main()
     if (!gouraudShading)
     {
         // TODO add there code for phong lighting
-//        // slides version - not working...
-//        vec4 v_position = viewMatrix * vec4(worldPos, 1.0);
-//        // normal transform in camera coordinates
-//        mat3 normMatrix = mat3(transpose(inverse(viewMatrix)));
-//        vec3 n = normMatrix * normalize(normal);
+//        // slides version - only partially working...
+//        vec3 n = normal;
 //
 //        // set base color
 //        vec4 baseColor = vec4(objectColor, 1.0);
 //
 //        // light and eye vectors, in camera coordinates
-//        vec3 l = normalize(light.position.xyz - vec3(v_position));
-//        vec3 e = normalize(-vec3(v_position));
+//        vec3 l = normalize(light.position.xyz - vec3(worldPos));
+//        vec3 e = normalize(-vec3(worldPos));
 //
 //        // ambient term
 //        color = material.ambient * vec3(light.color) * vec3(baseColor);
@@ -85,22 +94,22 @@ void main()
 
         // V2
         vec3 norm = normalize(normal);
-        vec3 lightVector = normalize(lightPosition - worldPos);
+        vec3 lightVector = normalize(light.position - worldPos);
         vec3 viewDirection = normalize(viewPosition - worldPos);
         vec3 eyeVector = reflect(-lightVector, norm);
 
         // Ambient
-        vec3 ambient = ambient * objectColor * lightColor;
+        vec3 ambient = material.ambient * objectColor * light.color;
 
         // Diffuse
         float diff = max(dot(norm, lightVector), 0.0);
-        vec3 diffuse = diff * diffuse * objectColor * lightColor;
+        vec3 diffuse = diff * material.diffuse * objectColor * light.color;
 
         // Specular
-        float spec = pow(max(dot(viewDirection, eyeVector), 0.0), shininess);
-        vec3 specular = spec * specular * objectColor * lightColor;
+        float spec = pow(max(dot(viewDirection, eyeVector), 0.0), material.shininess);
+        vec3 specular = spec * material.specular * objectColor * light.color;
 
-        color = (ambient + diffuse + specular) * objectColor * lightColor;
+        color = (ambient + diffuse + specular) * objectColor * light.color;
 
         // END TODO
     }

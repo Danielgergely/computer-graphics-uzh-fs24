@@ -139,7 +139,7 @@ namespace cgCourse
 //
 //        // light color setting
 //        glUniform4f(program->getUniformLocation("light.color"), lightColor[0], lightColor[1], lightColor[2], 1.0f);
-
+//
 //        glUniform1f(program->getUniformLocation("material.ambient"), 0.20f);
 //        glUniform1f(program->getUniformLocation("material.diffuse"), 0.20f);
 //        glUniform1f(program->getUniformLocation("material.specular"), 0.8);
@@ -148,20 +148,20 @@ namespace cgCourse
 
         // V2
         glm::vec3 lightPos = lightbox->getPosition();
-        glUniform3f(program->getUniformLocation("lightPosition"), lightPos[0], lightPos[1], lightPos[2] );
+        glUniform3f(program->getUniformLocation("light.position"), lightPos[0], lightPos[1], lightPos[2] );
 
         // light color setting
-        glUniform3f(program->getUniformLocation("lightColor"), lightColor[0], lightColor[1], lightColor[2]);
+        glUniform3f(program->getUniformLocation("light.color"), lightColor[0], lightColor[1], lightColor[2]);
 
 
         // light properties
-        glUniform3f(program->getUniformLocation("ambient"), 0.20f, 0.70f, 0.01f);
-        glUniform3f(program->getUniformLocation("diffuse"), 0.20f, 0.70f, 0.01f);
-        glUniform3f(program->getUniformLocation("specular"), 0.8, 0.8, 0.8);
-        glUniform1f(program->getUniformLocation("shininess"), 16.0f);
+        glUniform3f(program->getUniformLocation("material.ambient"), 0.30f, 0.30f, 0.30f);
+        glUniform3f(program->getUniformLocation("material.diffuse"), 0.60f, 0.60f, 0.60f);
+        glUniform3f(program->getUniformLocation("material.specular"), 0.8, 0.8, 0.8);
+        glUniform1f(program->getUniformLocation("material.shininess"), 32.0f);
 
         // viewer position
-        glUniform3f(program->getUniformLocation("viewerPosition"), cam.getPosition().x, cam.getPosition().y, cam.getPosition().z);
+        glUniform3f(program->getUniformLocation("viewPosition"), cam.getPosition().x, cam.getPosition().y, cam.getPosition().z);
 
         // unbinding the shader program
         program->unbind();
