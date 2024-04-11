@@ -99,7 +99,7 @@ void main()
         vec3 eyeVector = reflect(-lightVector, norm);
 
         // Ambient
-        vec3 ambient = material.ambient * objectColor * light.color;
+        vec3 ambient = material.ambient * objectColor;
 
         // Diffuse
         float diff = max(dot(norm, lightVector), 0.0);
@@ -110,6 +110,9 @@ void main()
         vec3 specular = spec * material.specular * objectColor * light.color;
 
         color = (ambient + diffuse + specular) * objectColor * light.color;
+
+        // comment out for showing each term
+//        color = specular * objectColor * light.color;
 
         // END TODO
     }

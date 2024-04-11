@@ -97,6 +97,9 @@ void main()
 
         objectColor = (ambient + diffuse + specular) * light.color * objectColor;
 
+        // comment out for showing each term
+//        objectColor = specular * light.color * objectColor;
+
         // END TODO
     }
 }
