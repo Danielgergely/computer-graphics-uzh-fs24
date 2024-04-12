@@ -52,12 +52,7 @@ uniform struct Material {
 } material;
 
 uniform vec3 viewPosition;
-//uniform vec3 lightPosition;
-//uniform vec3 lightColor;
-//uniform vec3 ambient;
-//uniform vec3 diffuse;
-//uniform vec3 specular;
-//uniform float shininess;
+uniform bool bonusTask;
 
 
 // END TODO
@@ -102,5 +97,11 @@ void main()
 
         // END TODO
     }
+
+    // ********************** bonus task ******************************
+    // comment out for spotlight only
+//    if(bonusTask) {
+//        objectColor = vColor;
+//    }
 }
 

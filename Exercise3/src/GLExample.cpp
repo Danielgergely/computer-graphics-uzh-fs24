@@ -163,6 +163,21 @@ namespace cgCourse
         // viewer position
         glUniform3f(program->getUniformLocation("viewPosition"), cam.getPosition().x, cam.getPosition().y, cam.getPosition().z);
 
+
+        // ********************** bonus task ******************************
+        if(bonusTask) {
+            // Define spotlight parameters
+            glm::vec3 spotlightPosition = glm::vec3(0.0f, 6.0f, -10.f);
+            glm::vec3 spotlightDirection = glm::vec3(0.0f, 0.5f, -1.0f);
+            float spotlightInnerAngle = glm::cos(glm::radians(12.0f));
+            float spotlightOuterAngle = glm::cos(glm::radians(10.0f));
+
+            // Pass spotlight parameters to shader
+            glUniform3fv(programForShape->getUniformLocation("spotlight.position"), 1, &spotlightPosition[0]);
+            glUniform3fv(programForShape->getUniformLocation("spotlight.direction"), 1, &spotlightDirection[0]);
+            glUniform1f(programForShape->getUniformLocation("spotlight.innerAngle"), spotlightInnerAngle);
+            glUniform1f(programForShape->getUniformLocation("spotlight.outerAngle"), spotlightOuterAngle);
+        }
         // unbinding the shader program
         program->unbind();
 
@@ -175,6 +190,7 @@ namespace cgCourse
         glUniformMatrix4fv(programForShape->getUniformLocation("mvpMatrix"), 1, GL_FALSE, &mvpMatrix[0][0]);
         glUniformMatrix4fv(programForShape->getUniformLocation("modelMatrix"), 1, GL_FALSE, &cube->getModelMatrix()[0][0]);
         glUniform1i(programForShape->getUniformLocation("gouraudShading"), renderMode == GOURAUD_SHADING);
+        glUniform1i(programForShape->getUniformLocation("bonusTask"), bonusTask);
         cube->draw();
         programForShape->unbind();
     }
@@ -185,6 +201,7 @@ namespace cgCourse
         glUniformMatrix4fv(programForShape->getUniformLocation("mvpMatrix"), 1, GL_FALSE, &mvpMatrix[0][0]);
         glUniformMatrix4fv(programForShape->getUniformLocation("modelMatrix"), 1, GL_FALSE, &torus->getModelMatrix()[0][0]);
         glUniform1i(programForShape->getUniformLocation("gouraudShading"), renderMode == GOURAUD_SHADING);
+        glUniform1i(programForShape->getUniformLocation("bonusTask"), bonusTask);
         torus->draw();
         programForShape->unbind();
 
@@ -203,6 +220,7 @@ namespace cgCourse
         glUniformMatrix4fv(programForShape->getUniformLocation("mvpMatrix"), 1, GL_FALSE, &mvpMatrix[0][0]);
         glUniformMatrix4fv(programForShape->getUniformLocation("modelMatrix"), 1, GL_FALSE, &torusKnot->getModelMatrix()[0][0]);
         glUniform1i(programForShape->getUniformLocation("gouraudShading"), renderMode == GOURAUD_SHADING);
+        glUniform1i(programForShape->getUniformLocation("bonusTask"), bonusTask);
         torusKnot->draw();
         programForShape->unbind();
 

@@ -40,18 +40,21 @@ uniform struct Material {
     vec3 specular;
     float shininess;
 } material;
-//uniform vec3 lightPosition;
-//uniform vec3 lightColor;
-//uniform vec3 ambient;
-//uniform vec3 diffuse;
-//uniform vec3 specular;
-//uniform float shininess;
+
+// bonus task
+uniform struct Spotlight {
+    vec3 position;
+    vec3 direction;
+    float innerAngle;
+    float outerAngle;
+} spotlight;
 
 uniform mat4 viewMatrix;
 
 // END TODO
 
 uniform bool gouraudShading;
+uniform bool bonusTask;
 
 // Ouput data
 out vec3 color;
@@ -65,32 +68,32 @@ void main()
     if (!gouraudShading)
     {
         // TODO add there code for phong lighting
-//        // slides version - only partially working...
-//        vec3 n = normal;
-//
-//        // set base color
-//        vec4 baseColor = vec4(objectColor, 1.0);
-//
-//        // light and eye vectors, in camera coordinates
-//        vec3 l = normalize(light.position.xyz - vec3(worldPos));
-//        vec3 e = normalize(-vec3(worldPos));
-//
-//        // ambient term
-//        color = material.ambient * vec3(light.color) * vec3(baseColor);
-//
-//        // diffuse term
-//        float diff = max(dot(n, l), 0.0);
-//        if (diff > 0) {
-//            color += material.diffuse * diff * vec3(light.color) * vec3(baseColor);
-//
-//            // specular term
-//            vec3 r = reflect(-l, n);
-//
-//            float spec = max(dot(r, e), 0.0);
-//            if (spec > 0) {
-//                color += material.specular * pow(spec, material.shininess) * vec3(light.color) * vec3(baseColor);
-//            }
-//        }
+        //        // slides version - only partially working...
+        //        vec3 n = normal;
+        //
+        //        // set base color
+        //        vec4 baseColor = vec4(objectColor, 1.0);
+        //
+        //        // light and eye vectors, in camera coordinates
+        //        vec3 l = normalize(light.position.xyz - vec3(worldPos));
+        //        vec3 e = normalize(-vec3(worldPos));
+        //
+        //        // ambient term
+        //        color = material.ambient * vec3(light.color) * vec3(baseColor);
+        //
+        //        // diffuse term
+        //        float diff = max(dot(n, l), 0.0);
+        //        if (diff > 0) {
+        //            color += material.diffuse * diff * vec3(light.color) * vec3(baseColor);
+        //
+        //            // specular term
+        //            vec3 r = reflect(-l, n);
+        //
+        //            float spec = max(dot(r, e), 0.0);
+        //            if (spec > 0) {
+        //                color += material.specular * pow(spec, material.shininess) * vec3(light.color) * vec3(baseColor);
+        //            }
+        //        }
 
         // V2
         vec3 norm = normalize(normal);
@@ -112,9 +115,38 @@ void main()
         color = (ambient + diffuse + specular) * objectColor * light.color;
 
         // comment out for showing each term
-//        color = specular * objectColor * light.color;
-
-        // END TODO
+        //        color = specular * objectColor * light.color;
     }
+
+    // ********************** bonus task ******************************
+    if (bonusTask) {
+        // comment out for spotlight only
+//        color = objectColor;
+
+        // Calculate direction from light to point
+        vec3 lightDir = normalize(worldPos - spotlight.position);
+
+        // Calculate angle between light direction and direction to point
+        float theta = dot(lightDir, normalize(-spotlight.direction));
+
+        // Check if point is inside light cone
+        if (theta > spotlight.outerAngle) {
+            // Calculate light intensity
+            float intensity;
+            if (theta > spotlight.innerAngle)
+            intensity = 1.0;
+            else
+            intensity = (theta - spotlight.outerAngle) / (spotlight.innerAngle - spotlight.outerAngle);
+
+            // Modify the color based on the spotlight intensity
+            color *= intensity;
+        } else {
+            // If the point is not in the spotlight, make it dark
+            color = vec3(0.0, 0.0, 0.0);
+        }
+    }
+
+    // END TODO
 }
+
 
