@@ -197,6 +197,10 @@ namespace cgCourse {
         glBindTexture(GL_TEXTURE_2D, cubetexSpec->getTexHandle());
         glUniform1i(programForTexturedShape->getUniformLocation("lightMapTexture"), 1);
 
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, cubetexNormal->getTexHandle());
+        glUniform1i(programForTexturedShape->getUniformLocation("normalMapTexture"), 2);
+
 
         // End TODO
 
@@ -213,6 +217,9 @@ namespace cgCourse {
         glBindTexture(GL_TEXTURE_2D, 0);
 
         glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, 0);
+
+        glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, 0);
 
         // TODO END
@@ -239,6 +246,10 @@ namespace cgCourse {
         glBindTexture(GL_TEXTURE_2D, torustexSpec->getTexHandle());
         glUniform1i(programForTexturedShape->getUniformLocation("lightMapTexture"), 1);
 
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, torustexNormal->getTexHandle());
+        glUniform1i(programForTexturedShape->getUniformLocation("normalMapTexture"), 2);
+
         // TODO END
 
         mvpMatrix = cam.getViewProjectionMatrix() * torus->getModelMatrix();
@@ -255,6 +266,9 @@ namespace cgCourse {
         glBindTexture(GL_TEXTURE_2D, 0);
 
         glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, 0);
+
+        glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, 0);
 
         // End TODO

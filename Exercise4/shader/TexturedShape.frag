@@ -11,14 +11,14 @@ in vec3 objectColor;
 /* TODO Add the required input data */
 in vec3 worldPos;
 in vec2 TexCoords;
-in vec3 Normal;
-in vec3 Tangent;
+in mat3 TBN;
 
 // END TODO
 
 /* TODO declare texture samplers here */
 uniform sampler2D diffuseTexture;
 uniform sampler2D lightMapTexture;
+uniform sampler2D normalMapTexture;
 
 // END TODO
 
@@ -42,21 +42,26 @@ void main()
 	 *      texture maps and texture coordinates in case that you face troubles.
 	 */
 
+	// normal map
+	vec3 normalMap = texture(normalMapTexture, TexCoords.xy).rgb;
+	vec3 normal = normalMap * 2.0 - 1.0;
+	normal = normalize(TBN * normal);
+
 	vec3 diffuseColor = texture(diffuseTexture, TexCoords).xyz;
 	vec3 lightMapColor = texture(lightMapTexture, TexCoords).xyz;
 
 	// ambient
-	float ambientFactor = 0.5f;
+	float ambientFactor = 0.3f;
 	vec3 ambient = (light.ambient.xyz * ambientFactor);
 
 	// diffuse
 	vec3 lightDirection = vec3(normalize(light.position - worldPos));
-	float diffuseTerm = max(dot(Normal, lightDirection), 0.0);
+	float diffuseTerm = max(dot(normal, lightDirection), 0.0);
 	vec3 diffuse = light.diffuse * diffuseTerm;
 
 	// specular
-	vec3 viewDirection = normalize(camPos - Normal);
-	vec3 reflectDirection = reflect(-lightDirection, Normal);
+	vec3 viewDirection = normalize(camPos - normal);
+	vec3 reflectDirection = reflect(-lightDirection, normal);
 	float specularTerm = pow(max(dot(viewDirection, reflectDirection), 0.0), 16);
 	vec3 specular = light.specular * specularTerm * lightMapColor;
 

@@ -152,8 +152,8 @@ namespace cgCourse
         for(int i = 0; i < positions.size(); i++) {
             int j = i % numSegmentsXY; // index of the current segment in XY plane
             int k = i / numSegmentsXZ; // index of the current segment in XZ plane
-            float u = float(j) / numSegmentsXY;
-            float v = float(k) / numSegmentsXZ;
+            float u = float(j) / numSegmentsXY * 4;
+            float v = float(k) / numSegmentsXZ * 4;
 
             texCoords.push_back(glm::vec2(u,v));
         }

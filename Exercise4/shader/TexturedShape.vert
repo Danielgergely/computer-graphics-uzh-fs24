@@ -15,8 +15,7 @@ out vec3 objectColor;
 // TODO Add the output data required in the fragment shader
 out vec3 worldPos;
 out vec2 TexCoords;
-out vec3 Normal;
-out vec3 Tangent;
+out mat3 TBN;
 
 // TODO END
 
@@ -32,8 +31,13 @@ void main()
 	/* TODO: set texture coordinates for fragment shader here here and additionally required output*/
 	worldPos = vec3(modelMatrix * vec4(vPosition, 1));
 	TexCoords = vTexCoords;
-	Normal = normalize(mat3(transpose(inverse(modelMatrix))) * vNormal);
-	Tangent = normalize(mat3(transpose(inverse(modelMatrix))) * vTangent);
+
+	// normal mapping
+	mat4 normalMatrix = transpose(inverse(modelMatrix));
+	vec3 vertexNormal = normalize(vec3(normalMatrix * vec4(vNormal, 0.0)));
+	vec3 tangent = normalize(vec3(normalMatrix * vec4(vTangent, 0.0)));
+	vec3 bitangent = normalize(cross(vertexNormal, tangent));
+	TBN = mat3(tangent, bitangent, vertexNormal);
 
 	// End TODO
 }
