@@ -10,6 +10,8 @@ namespace cgCourse
     class Texture
     {
     public:
+        // Bonus task
+        void createTexture();
         void loadFromFile(const std::string & filename);
         const GLuint & getTexHandle() const;
 

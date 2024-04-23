@@ -11,6 +11,7 @@
 #include <vector>
 #include <numeric>
 #include <algorithm>
+#include <glm/vec3.hpp>
 // END Bonus
 
 using namespace cimg_library;
@@ -68,6 +69,37 @@ namespace cgCourse {
         glGenerateMipmap(GL_TEXTURE_2D);
 
         glBindTexture(GL_TEXTURE_2D, 0);
+    }
+
+    // Bonus Task
+    void Texture::createTexture() {
+        // Create a texture with a size of 256x256
+        size.x = 256;
+        size.y = 256;
+
+        std::vector<glm::vec3> pixels(size.x * size.y);
+
+        // color filing
+        for (int y = 0; y < size.y; ++y) {
+            for (int x = 0; x < size.x; ++x) {
+                float r = float(x) / size.x;
+                float g = float(y) / size.y;
+                float b = 0.5f;
+                pixels[y * size.x + x] = glm::vec3(r, g, b);
+            }
+        }
+
+        // texture creation
+        glGenTextures(1, &texhandle);
+        glBindTexture(GL_TEXTURE_2D, texhandle);
+
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, size.x, size.y, 0, GL_RGB, GL_FLOAT, pixels.data());
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        glBindTexture(GL_TEXTURE_2D, 0);
+
     }
 
     const GLuint &Texture::getTexHandle() const {

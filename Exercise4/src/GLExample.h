@@ -46,6 +46,10 @@ namespace cgCourse
         void renderBasicCube();
         void renderBasicTorus();
 
+        // Bonus Task
+        void renderBonusCube();
+        void renderBonusTorus();
+
         std::shared_ptr<ShaderProgram> programForTexturedShape;
 		std::shared_ptr<ShaderProgram> programForTexturedNormals;
 		std::shared_ptr<ShaderProgram> programForLightBox;
@@ -63,6 +67,11 @@ namespace cgCourse
 		std::shared_ptr<Texture> torustex;
 		std::shared_ptr<Texture> torustexSpec;
         std::shared_ptr<Texture> torustexNormal;
+
+        // Bonus Task
+        std::shared_ptr<Texture> cubetexBonus;
+        std::shared_ptr<Texture> torustexBonus;
+
 
         const int GOURAUD_SHADING = 0;
         const int PHONG_SHADING = 1;
