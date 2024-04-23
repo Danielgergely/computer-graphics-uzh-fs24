@@ -9,6 +9,7 @@
 in vec3 objectColor;
 
 /* TODO Add the required input data */
+in vec3 worldPos;
 in vec2 TexCoords;
 in vec3 Normal;
 in vec3 Tangent;
@@ -41,25 +42,29 @@ void main()
 	 *      texture maps and texture coordinates in case that you face troubles.
 	 */
 
-	vec3 diffuseColor = texture(diffuseTexture, TexCoords).rgb;
-	vec3 lightMapColor = texture(lightMapTexture, TexCoords).rgb;
+	vec3 diffuseColor = texture(diffuseTexture, TexCoords).xyz;
+	vec3 lightMapColor = texture(lightMapTexture, TexCoords).xyz;
 
-	vec3 N = normalize(Normal);
-	vec3 lightDirection = normalize(light.position - camPos);
+	// ambient
+	float ambientFactor = 0.5f;
+	vec3 ambient = (light.ambient.xyz * ambientFactor);
 
-	float diffuseTerm = max(dot(N, lightDirection), 0.0);
+	// diffuse
+	vec3 lightDirection = vec3(normalize(light.position - worldPos));
+	float diffuseTerm = max(dot(Normal, lightDirection), 0.0);
+	vec3 diffuse = light.diffuse * diffuseTerm;
 
-	vec3 viewDirection = normalize(camPos - N);
-	vec3 reflectDirection = reflect(-lightDirection, N);
-
-	float specularTerm = pow(max(dot(viewDirection, reflectDirection), 0.0), 32);
-
-	vec3 ambient = light.ambient * diffuseColor;
-	vec3 diffuse = light.diffuse * diffuseTerm * diffuseColor;
+	// specular
+	vec3 viewDirection = normalize(camPos - Normal);
+	vec3 reflectDirection = reflect(-lightDirection, Normal);
+	float specularTerm = pow(max(dot(viewDirection, reflectDirection), 0.0), 16);
 	vec3 specular = light.specular * specularTerm * lightMapColor;
 
-	color = ambient + diffuse + specular;
+	color = (ambient + diffuse + specular) * diffuseColor.rgb, 1.0;
 
+//	color = vec3(TexCoords, 1.f);
+
+//	color = diffuseColor;
 
 
 	// TODO END

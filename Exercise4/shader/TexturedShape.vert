@@ -13,6 +13,7 @@ layout(location = 4) in vec3 vTangent;
 
 out vec3 objectColor;
 // TODO Add the output data required in the fragment shader
+out vec3 worldPos;
 out vec2 TexCoords;
 out vec3 Normal;
 out vec3 Tangent;
@@ -29,9 +30,10 @@ void main()
 	objectColor = vColor;
 
 	/* TODO: set texture coordinates for fragment shader here here and additionally required output*/
+	worldPos = vec3(modelMatrix * vec4(vPosition, 1));
 	TexCoords = vTexCoords;
-	Normal = mat3(modelMatrix) * vNormal;
-	Tangent = mat3(modelMatrix) * vTangent;
+	Normal = normalize(mat3(transpose(inverse(modelMatrix))) * vNormal);
+	Tangent = normalize(mat3(transpose(inverse(modelMatrix))) * vTangent);
 
 	// End TODO
 }

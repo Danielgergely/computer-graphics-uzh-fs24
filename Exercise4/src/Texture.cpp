@@ -57,7 +57,8 @@ namespace cgCourse {
         } else if (channels == 3) {
             format = GL_RGB;
         } else if (channels == 1) {
-            format = GL_RED;
+            // format = GL_RED; // highlights using red
+            format = GL_LUMINANCE; // highlights using white
         } else {
             std::cerr << "Unsupported number of channels: " << channels << std::endl;
             return;
