@@ -8,7 +8,6 @@
 #include "MultiLine.h"
 #include "Camera.h"
 #include "Texture.h"
-#include "Quad.h"
 
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/matrix_transform.hpp>
