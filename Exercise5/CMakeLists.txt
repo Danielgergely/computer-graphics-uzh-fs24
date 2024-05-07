@@ -19,6 +19,8 @@ include_directories(${CMAKE_SOURCE_DIR})
 
 FILE(GLOB_RECURSE sources ${CMAKE_SOURCE_DIR}/src/*.cpp)
 
-add_executable(${PROJECT_NAME} ${sources})
+add_executable(${PROJECT_NAME} ${sources}
+        src/Quad.h
+        src/Quad.cpp)
 target_link_libraries(${PROJECT_NAME} OpenGL::GL GLEW::GLEW glfw glm::glm imgui)
 

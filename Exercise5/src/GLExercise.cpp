@@ -41,7 +41,6 @@ namespace cgCourse {
         if (!normalsTorus.createVertexArray(0, 1, 2, 3, 4))
             return false;
 
-
         light.ambientTerm = {1, 1, 1};
         light.diffuseTerm = {1, 1, 1};
         light.specularTerm = {1, 1, 1};
@@ -87,6 +86,8 @@ namespace cgCourse {
             std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+        glEnable(GL_DEPTH_TEST);
+
         return true;
     }
 
@@ -98,7 +99,7 @@ namespace cgCourse {
         tc += 0.5;
 
         torus.setRotation(ta, glm::vec3(1.0f, 1.0f, 1.0f));
-//        cube.setRotation(tc, glm::vec3(0, 1.0f, 0));
+        cube.setRotation(tc, glm::vec3(0, 1.0f, 0));
 
         if (animationDir == Forward) {
             if (animation > 1.5)
@@ -129,7 +130,7 @@ namespace cgCourse {
         // TODO: compute lightSpaceMatrix
         glm::vec3 lightPos = lightbox.objectPosition;
         glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
-        float near_plane = 5.0f, far_plane = 5.5f;
+        float near_plane = 0.0f, far_plane = 16.0f;
         glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
         glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 

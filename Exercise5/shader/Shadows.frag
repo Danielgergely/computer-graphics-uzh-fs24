@@ -9,5 +9,6 @@ out vec3 color;
 void main()
 {
     // TODO: complete
+    color = vec3(gl_FragCoord.z);
 }
 

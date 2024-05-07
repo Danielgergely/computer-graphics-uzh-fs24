@@ -30,6 +30,6 @@ void main()
 	tbn = mat3(t, b, n);
 
 	// TODO: compute posLightSpace using the lightSpaceMatrix
-	posLightSpace = lightSpaceMatrix * modelMatrix * vec4(vPosition, 1);
+	posLightSpace = lightSpaceMatrix * vec4(worldPos, 1.0);
 }
 

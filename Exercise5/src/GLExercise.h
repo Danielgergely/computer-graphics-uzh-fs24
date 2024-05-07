@@ -8,6 +8,7 @@
 #include "MultiLine.h"
 #include "Camera.h"
 #include "Texture.h"
+#include "Quad.h"
 
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -54,7 +55,6 @@ namespace cgCourse
 		void renderLightBox();
 		void renderCubes(const glm::mat4 & lightSpaceMatrix);
 		void renderTorus(const glm::mat4 & lightSpaceMatrix);
-
 		void shadow_mapping(const glm::mat4 & lightSpaceMatrix);
 
 		std::shared_ptr<ShaderProgram> programForShadows;
