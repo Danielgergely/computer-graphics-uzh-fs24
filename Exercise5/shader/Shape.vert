@@ -30,6 +30,6 @@ void main()
 	tbn = mat3(t, b, n);
 
 	// TODO: compute posLightSpace using the lightSpaceMatrix
-	gl_Position = lightSpaceMatrix * modelMatrix * vec4(vPosition, 1);
+	posLightSpace = lightSpaceMatrix * modelMatrix * vec4(vPosition, 1);
 }
 

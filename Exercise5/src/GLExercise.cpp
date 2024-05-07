@@ -67,6 +67,7 @@ namespace cgCourse {
 
 
         // TODO: ShadowMapping depth buffer and texture initialization, use shadows struct.
+        glGenFramebuffers(1, &shadows.depthMapFBO);
 
         // 2D texture -> framebuffer's depth buffer
         glGenTextures(1, &shadows.depthMap);
@@ -82,6 +83,8 @@ namespace cgCourse {
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadows.depthMap, 0);
         glDrawBuffer(GL_NONE);
         glReadBuffer(GL_NONE);
+        if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+            std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         return true;
@@ -95,7 +98,7 @@ namespace cgCourse {
         tc += 0.5;
 
         torus.setRotation(ta, glm::vec3(1.0f, 1.0f, 1.0f));
-        cube.setRotation(tc, glm::vec3(0, 1.0f, 0));
+//        cube.setRotation(tc, glm::vec3(0, 1.0f, 0));
 
         if (animationDir == Forward) {
             if (animation > 1.5)
@@ -126,13 +129,13 @@ namespace cgCourse {
         // TODO: compute lightSpaceMatrix
         glm::vec3 lightPos = lightbox.objectPosition;
         glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
-        float near_plane = 1.0f, far_plane = 7.5f;
+        float near_plane = 5.0f, far_plane = 5.5f;
         glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
         glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 
         shadow_mapping(lightSpaceMatrix);
 
-//        if (displayDepthBuffer)
+        if (displayDepthBuffer)
             return true;
 
 
