@@ -44,6 +44,12 @@ private:
     glm::vec3 light_source;
 
 public:
+    rt_simple(const std::vector<Shape *> &shapes) {
+        for (auto &shape: shapes) {
+            add_mesh(*shape);
+        }
+    }
+
     // TODO: complete the definition of this method.
     float intersect_depth(const glm::vec3 &org, const glm::vec3 &dir) override
     {
@@ -61,7 +67,7 @@ public:
                 glm::vec3 shadow_dir = glm::normalize(light_source - (org + distance * dir));
                 float shadow_distance;
                 // if shadow ray intersects any object before reaching light source, point is in shadow
-                in_shadow = intersect_depth(org + distance * dir, shadow_dir) > 0;
+                in_shadow = shadow_ray_intersects(org + distance * dir, shadow_dir) > 0;
             }
         }
 
@@ -81,10 +87,15 @@ public:
         return false;
     }
     bool intersect_triangle(const Triangle &tri, const glm::vec3 &org, const glm::vec3 &dir, float & distance);
+    unsigned add_mesh(const Shape &mesh);
 };
 
 
 class rt_embree : public ray_tracer, public embree {
+private:
+    bool in_shadow = false;
+    glm::vec3 light_source;
+
 public:
     rt_embree(const std::vector<Shape *> &shapes) {
         for (auto &mesh: shapes)
@@ -95,7 +106,18 @@ public:
 
     float intersect_depth(const glm::vec3 &org, const glm::vec3 &dir) {
         ray_hit r(org, dir);
-        return intersect(r) ? r.ray.tfar : 0.f;
+        bool hit = intersect(r);
+
+        if (hit) {
+            glm::vec3 shadow_dir = glm::normalize(light_source - (org + r.ray.tfar * dir));
+            in_shadow = shadow_ray_intersects(org + r.ray.tfar * dir, shadow_dir) > 0;
+        }
+        return hit ? r.ray.tfar : 0.f;
+    }
+
+    bool shadow_ray_intersects(const glm::vec3 &org, const glm::vec3 &dir) {
+        ray_hit r(org, dir);
+        return intersect(r);
     }
 };
 

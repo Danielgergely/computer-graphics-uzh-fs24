@@ -53,7 +53,51 @@ bool rt_simple::intersect_triangle(const rt_simple::Triangle &tri, const glm::ve
     float a = glm::dot(e1, h);
 
     if(a > -EPSILON && a < EPSILON)
-        return false; // ray paral
+        return false; // ray parallel with the triangle
 
+    float f = 1.0f / a;
+    glm::vec3 s = org - tri.v0.position;
+    float u = f * glm::dot(s, h);
+
+    if(u < 0.0f || u > 1.0f)
+        return false;
+
+    glm::vec3 q = glm::cross(s, e1);
+    float v = f * glm::dot(dir, q);
+
+    if(v < 0.0f || u + v > 1.0f)
+        return false;
+
+    // compute t to find out where the intersection point is on the line
+    float t = f * glm::dot(e2, q);
+
+    // ray intersection
+    if(t > EPSILON) {
+        distance = t;
+        return true;
+    }
+
+    return false; // line intersection, but no ray intersection
+
+}
+
+unsigned rt_simple::add_mesh(const Shape &mesh)
+{
+    glm::mat4 model_matrix = mesh.getModelMatrix();
+    glm::mat3 normal_matrix = glm::transpose(glm::inverse(glm::mat3(model_matrix)));
+    for (auto face : mesh.faces)
+    {
+        Triangle triangle;
+        triangle.v0.position = glm::vec3(model_matrix * glm::vec4(mesh.positions[face[0]], 1.0f));
+        triangle.v1.position = glm::vec3(model_matrix * glm::vec4(mesh.positions[face[1]], 1.0f));
+        triangle.v2.position = glm::vec3(model_matrix * glm::vec4(mesh.positions[face[2]], 1.0f));
+        triangle.v0.color = mesh.colors[face[0]];
+        triangle.v1.color = mesh.colors[face[1]];
+        triangle.v2.color = mesh.colors[face[2]];
+        triangle.v0.normal = normal_matrix*mesh.normals[face[0]];
+        triangle.v1.normal = normal_matrix*mesh.normals[face[1]];
+        triangle.v2.normal = normal_matrix*mesh.normals[face[2]];
+        triangles.push_back(triangle);
+    }
 }
 
