@@ -33,6 +33,11 @@ namespace cgCourse
 		GLuint depthMapFBO;
 	};
 
+    enum RayTracerType {
+        RT_EMBREE,
+        RT_SIMPLE
+    };
+
 	class GLExample : public GLApp
 	{
 	public:
@@ -91,6 +96,9 @@ namespace cgCourse
 		ShadowMapping shadows;
 
 		ray_tracer * rt = nullptr;
+
+        RayTracerType currentRayTracerType;
+        bool useRayTracing = true;
 	};
 }
 

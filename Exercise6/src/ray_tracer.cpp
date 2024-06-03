@@ -1,8 +1,9 @@
 #include "ray_tracer.h"
+
 #define EPSILON 0.00000001f
 
 // TODO: play with the samples number, add a input control in the UI (user interface, ImGui window)
-int ray_tracer::samples = 4;
+int ray_tracer::samples = 2;
 
 
 void ray_tracer::raycasting(float *buffer, const glm::ivec2 &window_size, const Camera &cam) {
@@ -44,60 +45,65 @@ glm::vec3 ray_tracer::ray_view_dir(const glm::ivec2 &pos, const glm::ivec2 &wind
 }
 
 // TODO: add the definition of the methods here.
-bool rt_simple::intersect_triangle(const rt_simple::Triangle &tri, const glm::vec3 &org, const glm::vec3 &dir,
-                                    float &distance) {
-    glm::vec3 e1 = tri.v1.position - tri.v0.position;
-    glm::vec3 e2 = tri.v2.position - tri.v0.position;
 
-    glm::vec3 h = glm::cross(dir, e2);
-    float a = glm::dot(e1, h);
+void ray_tracer::render(glm::vec3 *img, const glm::ivec2 &window_size, const Camera &cam, const glm::vec3 &light) {
+    glm::mat4 inv_proj_view = glm::inverse(cam.getViewProjectionMatrix());
 
-    if(a > -EPSILON && a < EPSILON)
-        return false; // ray parallel with the triangle
+    #pragma omp parallel for
+    for (int i = 0; i < window_size.x; ++i)
+        for (int j = 0; j < window_size.y; ++j) {
+            //row major
+            glm::vec3 & color = img[j * window_size.x + i];
+            glm::vec3 dir = ray_view_dir({i, j}, window_size, inv_proj_view, cam.getPosition());
 
-    float f = 1.0f / a;
-    glm::vec3 s = org - tri.v0.position;
-    float u = f * glm::dot(s, h);
+            color = glm::vec3(0);
+            for(int s = 0; s < samples; ++s)
+                color += color_intersect(cam.getPosition(), dir, light);
 
-    if(u < 0.0f || u > 1.0f)
-        return false;
-
-    glm::vec3 q = glm::cross(s, e1);
-    float v = f * glm::dot(dir, q);
-
-    if(v < 0.0f || u + v > 1.0f)
-        return false;
-
-    // compute t to find out where the intersection point is on the line
-    float t = f * glm::dot(e2, q);
-
-    // ray intersection
-    if(t > EPSILON) {
-        distance = t;
-        return true;
-    }
-
-    return false; // line intersection, but no ray intersection
+            color /= samples;
+        }
 
 }
 
-unsigned rt_simple::add_mesh(const Shape &mesh)
-{
-    glm::mat4 model_matrix = mesh.getModelMatrix();
-    glm::mat3 normal_matrix = glm::transpose(glm::inverse(glm::mat3(model_matrix)));
-    for (auto face : mesh.faces)
-    {
-        Triangle triangle{};
-        triangle.v0.position = glm::vec3(model_matrix * glm::vec4(mesh.positions[face[0]], 1.0f));
-        triangle.v1.position = glm::vec3(model_matrix * glm::vec4(mesh.positions[face[1]], 1.0f));
-        triangle.v2.position = glm::vec3(model_matrix * glm::vec4(mesh.positions[face[2]], 1.0f));
-        triangle.v0.color = mesh.colors[face[0]];
-        triangle.v1.color = mesh.colors[face[1]];
-        triangle.v2.color = mesh.colors[face[2]];
-        triangle.v0.normal = normal_matrix*mesh.normals[face[0]];
-        triangle.v1.normal = normal_matrix*mesh.normals[face[1]];
-        triangle.v2.normal = normal_matrix*mesh.normals[face[2]];
-        triangles.push_back(triangle);
-    }
+
+glm::vec3 shading(const std::vector<glm::vec3> &values, const glm::uvec3 &triangle, const float &u, const float &v) {
+    // Calculate the weighted average of the values at the vertices of the triangle
+    glm::vec3 result = (1 - u - v) * values[triangle[0]] +
+                       u * values[triangle[1]] +
+                       v * values[triangle[2]];
+    return result;
+}
+
+glm::vec3 ray_tracer::calculate_color(cgCourse::Shape *shape, const int &triangle_id, const float &u, const float &v,
+                                      const glm::vec3 &light, const glm::vec3 &camera_position) {
+
+    const glm::mat4 &model_matrix = shape->getModelMatrix();
+    const glm::uvec3 &triangle = shape->faces[triangle_id];
+
+    glm::vec3 pos = glm::vec3(model_matrix * glm::vec4(shading(shape->positions, triangle, u, v), 1.0f));
+    glm::vec3 normal = glm::normalize(
+            glm::vec3(model_matrix * glm::vec4(shading(shape->normals, triangle, u, v), 0.0f)));
+    glm::vec3 color = shading(shape->colors, triangle, u, v);
+
+    // Calculate the light direction
+    glm::vec3 light_direction = glm::normalize(light - pos);
+
+    float dot_difference = std::max(dot(normal, light_direction), 0.0f);
+    glm::vec3 diffuseColor = dot_difference * glm::vec3(1);
+
+    glm::vec3 view_direction = normalize(camera_position - pos);
+    glm::vec3 reflect_direction = reflect(-light_direction, normal);
+    float specular_dot = std::max(dot(view_direction, reflect_direction), 0.0f);
+    float spec = pow(specular_dot, 32);
+    float specular_strength = 1.0;
+    glm::vec3 specular_color = specular_strength * spec * glm::vec3(1);
+
+    float s = shadow_ray_intersects(pos, light_direction) ? 0.4 : 1;
+
+    const glm::vec3 ambient_color(0.25f);
+
+    return ((ambient_color + diffuseColor) * color + specular_color * 0.5f) * s;
+
+
 }
 

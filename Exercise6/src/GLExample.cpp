@@ -323,26 +323,50 @@ namespace cgCourse
 		static float build_time = 0;
 		static float rays_time = 0;
 
+        const char* ray_tracers[] = {"Simple", "Embree"};
+        static int currentItem = 1;
+
+        ImGui::Combo("Ray Tracer", &currentItem, ray_tracers, IM_ARRAYSIZE(ray_tracers));
+
+        ImGui::Checkbox("Use Ray Tracing", &useRayTracing);
+
+
+        switch (currentItem) {
+            case 0:
+                currentRayTracerType = RT_SIMPLE;
+                break;
+            case 1:
+                currentRayTracerType = RT_EMBREE;
+                break;
+        }
+
 
 		if(ImGui::Button("Depth Ray Casting"))
 		{
 			glm::uvec2 window_size = getFramebufferSize();
 
-			CImg<float> img(window_size.x, window_size.y, 1);
+            CImg<float> img(!useRayTracing ? 3 : 1, window_size.x, window_size.y);
 
 			build_time = omp_get_wtime();
-//				if(!rt) rt = new rt_embree({torus.get(), cube.get()});
+
+            if (currentRayTracerType == RT_SIMPLE) {
+                if(!rt) rt = new rt_simple({torus.get(), cube.get()});
+            } else if (currentRayTracerType == RT_EMBREE) {
+                if(!rt) rt = new rt_embree({torus.get(), cube.get()});
+            }
             // TODO: uncomment the line to test your ray tracer implementation and comment the line before.
-            if(!rt) rt = new rt_simple({torus.get(), cube.get()});
-            rt->setLightSource(lightbox->getPosition());
 			build_time = omp_get_wtime() - build_time;
 
 			rays_time = omp_get_wtime();
-				rt->raycasting(img.data(), window_size, cam);
+            useRayTracing ? rt->raycasting(img.data(), window_size, cam)
+            : rt->render((glm::vec3 *) img.data(), window_size, cam, lightbox->getPosition());
 			rays_time = omp_get_wtime() - rays_time;
 
-			img.normalize(0, 255);
-			img.save("depth2.jpg");
+            img.permute_axes("yzcx");
+            img.mirror('y');
+            img.normalize(0, 255);
+
+            useRayTracing ? img.save("depth.jpg") : img.save("color.jpg");
 		}
 
 		ImGui::Indent();
