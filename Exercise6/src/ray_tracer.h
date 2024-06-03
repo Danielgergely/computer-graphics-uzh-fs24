@@ -5,6 +5,9 @@
 
 
 class ray_tracer {
+
+protected:
+    glm::vec3 light_source;
 public:
     static int samples;
 
@@ -12,6 +15,10 @@ public:
     ray_tracer() = default;
 
     ~ray_tracer() = default;
+
+    void setLightSource(const glm::vec3 &lightSource) {
+        light_source = lightSource;
+    }
 
     virtual float intersect_depth(const glm::vec3 &org, const glm::vec3 &dir) = 0;
 
@@ -41,13 +48,13 @@ private:
 
     std::vector<Triangle> triangles;
     bool in_shadow = false;
-    glm::vec3 light_source;
 
 public:
-    rt_simple(const std::vector<Shape *> &shapes) {
+    explicit rt_simple(const std::vector<Shape *> &shapes) {
         for (auto &shape: shapes) {
             add_mesh(*shape);
         }
+        bool a = true;
     }
 
     // TODO: complete the definition of this method.
@@ -94,7 +101,6 @@ public:
 class rt_embree : public ray_tracer, public embree {
 private:
     bool in_shadow = false;
-    glm::vec3 light_source;
 
 public:
     rt_embree(const std::vector<Shape *> &shapes) {

@@ -87,7 +87,7 @@ unsigned rt_simple::add_mesh(const Shape &mesh)
     glm::mat3 normal_matrix = glm::transpose(glm::inverse(glm::mat3(model_matrix)));
     for (auto face : mesh.faces)
     {
-        Triangle triangle;
+        Triangle triangle{};
         triangle.v0.position = glm::vec3(model_matrix * glm::vec4(mesh.positions[face[0]], 1.0f));
         triangle.v1.position = glm::vec3(model_matrix * glm::vec4(mesh.positions[face[1]], 1.0f));
         triangle.v2.position = glm::vec3(model_matrix * glm::vec4(mesh.positions[face[2]], 1.0f));
